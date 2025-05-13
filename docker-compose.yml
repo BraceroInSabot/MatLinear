@@ -1,0 +1,36 @@
+services:
+  django:
+    container_name: django
+    build: 
+      context: .
+      dockerfile: Docker/Dockerfile
+    command: python /app/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - MINIO_STORAGE_BUCKET_NAME=${MINIO_STORAGE_BUCKET_NAME}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_STORAGE_ENDPOINT_URL=${MINIO_STORAGE_ENDPOINT_URL}
+      - MINIO_ACCESS_URL=${MINIO_ACCESS_URL}
+
+  minio:
+    container_name: minio
+    image: minio/minio:latest
+    ports:
+    - 9000:9000
+    - 9001:9001
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: server /data --console-address ":9001"
+    volumes:
+    - minio-data:/data
+
+volumes:
+  minio-data:
+  

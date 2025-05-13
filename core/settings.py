@@ -79,8 +79,23 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
+STATICFILES_LOCATION = 'static'
+STATICFILES_STORAGE = "blogs.storage.StaticS3Boto3Storage"
+
+MEDIA_URL = '/media/'
+DEFAULT_FILE_STORAGE = "blogs.storage.S3MediaStorage"
+
+# BUCKET MINIO Configuration
+
+AWS_ACCESS_KEY_ID = config("MINIO_ACCESS_KEY", default=False, cast=str)
+AWS_SECRET_ACCESS_KEY = config("MINIO_SECRET_KEY", default=False, cast=str)
+AWS_STORAGE_BUCKET_NAME = config("MINIO_STORAGE_BUCKET_NAME", default=False, cast=str)
+AWS_S3_ENDPOINT_URL = config("MINIO_STORAGE_ENDPOINT_URL", default=False, cast=str)
+MINIO_ACCESS_URL = config("MINIO_ACCESS_URL", default=False, cast=str)
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
