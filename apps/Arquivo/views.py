@@ -10,15 +10,16 @@ class ListarArquivosAPI(APIView):
 
 class InserirArquivoAPI(APIView):
     def post(self, request):
-        arquivo = request.FILES.get("arquivo")
+        arquivo: object = request.FILES.get("arquivo")
         titulo = request.POST.get("titulo")
-        tamanho_MB = request.POST.get("tamanho_MB")
+        tamanho_MB = round(arquivo.size / (1024 * 1024), 5)
+        print(tamanho_MB)
 
         if not arquivo:
             return Response({"erro": "Arquivo não enviado."}, status=status.HTTP_400_BAD_REQUEST)
         
-        if not titulo or not tamanho_MB:
-            return Response({"erro": "Título e tamanho são obrigatórios."}, status=status.HTTP_400_BAD_REQUEST)
+        if not titulo:
+            return Response({"erro": "Título obrigatório."}, status=status.HTTP_400_BAD_REQUEST)
 
 
         arq = Arquivo.objects.create(

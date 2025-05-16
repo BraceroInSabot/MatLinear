@@ -1,33 +1,26 @@
 from django.db import models
 from storages.backends.s3boto3 import S3Boto3Storage
 from django.conf import settings
-import os
-import uuid
-
-class StaticS3Boto3Storage(S3Boto3Storage):
-    location = settings.STATICFILES_LOCATION
-
-    def __init__(self, *args, **kwargs):
-        if settings.MINIO_ACCESS_URL:
-            self.secure_urls = False
-            self.custom_domain = settings.MINIO_ACCESS_URL
-        super(StaticS3Boto3Storage, self).__init__(*args, **kwargs)
 
 class S3MediaStorage(S3Boto3Storage):
+    """
+    Armazenamento de arquivos de mídia no MinIO.
+    """
     def __init__(self, *args, **kwargs):
         if settings.MINIO_ACCESS_URL:
             self.secure_urls = False
             self.custom_domain = settings.MINIO_ACCESS_URL
         super(S3MediaStorage, self).__init__(*args, **kwargs)
 
-def file_upload_to(instance, filename):
-    """
-    Gera um caminho único e seguro para o upload do arquivo.
-    """
-    unique_id = uuid.uuid4().hex
-    sanitized_filename = filename.strip().lower().replace(" ", "_").replace("-", "_")
-    print(instance, filename)
-    return os.path.join("arquivos", unique_id, sanitized_filename)
+# Descomentar a função para ser armazenado arquivos localmente
+#
+# def file_upload_to(instance, filename):
+#     """
+#     Gera um caminho único e seguro para o upload do arquivo.
+#     """
+#     unique_id = uuid.uuid4().hex
+#     sanitized_filename = filename.strip().lower().replace(" ", "_").replace("-", "_")
+#     return os.path.join("arquivos", unique_id, sanitized_filename)
 
 class Arquivo(models.Model):
     """
