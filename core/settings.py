@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "apps.Arquivo",
     "rest_framework",
+    "storages"
 ]
 
 MIDDLEWARE = [
@@ -81,22 +82,87 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_LOCATION = 'static'
-STATICFILES_STORAGE = "blogs.storage.StaticS3Boto3Storage"
+STATICFILES_STORAGE = "storages.storage.StaticS3Boto3Storage"
 
-MEDIA_URL = '/media/'
+MEDIA_URL = f"{config('MINIO_ACCESS_URL')}/"
+
 DEFAULT_FILE_STORAGE = "blogs.storage.S3MediaStorage"
 
-# BUCKET MINIO Configuration
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = 'us-east-1'
+AWS_S3_ENDPOINT_URL = config("AWS_S3_URL")
 
-AWS_ACCESS_KEY_ID = config("MINIO_ACCESS_KEY", default=False, cast=str)
-AWS_SECRET_ACCESS_KEY = config("MINIO_SECRET_KEY", default=False, cast=str)
-AWS_STORAGE_BUCKET_NAME = config("MINIO_STORAGE_BUCKET_NAME", default=False, cast=str)
-AWS_S3_ENDPOINT_URL = config("MINIO_STORAGE_ENDPOINT_URL", default=False, cast=str)
-MINIO_ACCESS_URL = config("MINIO_ACCESS_URL", default=False, cast=str)
+MINIO_ACCESS_URL = config("MINIO_ACCESS_URL")
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+        'AWS_ACCESS_KEY_ID': AWS_ACCESS_KEY_ID,
+        'AWS_SECRET_ACCESS_KEY': AWS_SECRET_ACCESS_KEY,
+        'AWS_STORAGE_BUCKET_NAME': AWS_STORAGE_BUCKET_NAME,
+        'AWS_S3_ENDPOINT_URL': AWS_S3_ENDPOINT_URL,
+        'AWS_S3_OBJECT_PARAMETERS': {
+            'CacheControl': 'max-age=86400',
+        },
+        'AWS_QUERYSTRING_AUTH': False,
+        'AWS_S3_FILE_OVERWRITE': False,
+        'AWS_DEFAULT_ACL': None,
+        'AWS_S3_REGION_NAME': AWS_S3_REGION_NAME,
+        'AWS_S3_CUSTOM_DOMAIN': f"{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_ENDPOINT_URL}",
+    },
+    'media': {
+        'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+        'AWS_ACCESS_KEY_ID': AWS_ACCESS_KEY_ID,
+        'AWS_SECRET_ACCESS_KEY': AWS_SECRET_ACCESS_KEY,
+        'AWS_STORAGE_BUCKET_NAME': AWS_STORAGE_BUCKET_NAME,
+        'AWS_S3_ENDPOINT_URL': AWS_S3_ENDPOINT_URL,
+        'AWS_S3_OBJECT_PARAMETERS': {
+            'CacheControl': 'max-age=86400',
+        },
+        'AWS_QUERYSTRING_AUTH': False,
+        'AWS_S3_FILE_OVERWRITE': False,
+        'AWS_DEFAULT_ACL': None,
+        'AWS_S3_REGION_NAME': AWS_S3_REGION_NAME,
+        'AWS_S3_CUSTOM_DOMAIN': f"{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_ENDPOINT_URL}",
+    },
+    'staticfiles': {
+        'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+        'AWS_ACCESS_KEY_ID': AWS_ACCESS_KEY_ID,
+        'AWS_SECRET_ACCESS_KEY': AWS_SECRET_ACCESS_KEY,
+        'AWS_STORAGE_BUCKET_NAME': AWS_STORAGE_BUCKET_NAME,
+        'AWS_S3_ENDPOINT_URL': AWS_S3_ENDPOINT_URL,
+        'AWS_S3_OBJECT_PARAMETERS': {
+            'CacheControl': 'max-age=86400',
+        },
+        'AWS_QUERYSTRING_AUTH': False,
+        'AWS_S3_FILE_OVERWRITE': False,
+        'AWS_DEFAULT_ACL': None,
+        'AWS_S3_REGION_NAME': AWS_S3_REGION_NAME,
+        'AWS_S3_CUSTOM_DOMAIN': f"{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_ENDPOINT_URL}",
+    }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
