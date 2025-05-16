@@ -6,13 +6,27 @@ from .models import Arquivo
 
 class ListarArquivosAPI(APIView):
     def get(self, request):
-        return Response("Oi", status=200)
+        """
+        Retorna uma lista de arquivos armazenados.
+        """
+        arquivos = Arquivo.objects.all().order_by("-data_upload")
+        dados = [
+            {
+                "id": arq.id_arquivo,
+                "titulo": arq.titulo,
+                "tamanho_MB": arq.tamanho_MB,
+                "data_upload": arq.data_upload
+            }
+            for arq in arquivos
+        ]
+        print(dados[0])
+        return Response(data={"Dados": list((dados))}, status=200)
 
 class InserirArquivoAPI(APIView):
     def post(self, request):
         arquivo: object = request.FILES.get("arquivo")
         titulo = request.POST.get("titulo")
-        tamanho_MB = round(arquivo.size / (1024 * 1024), 5)
+        tamanho_MB = round(arquivo.size / (1024 * 1024), 2)
         print(tamanho_MB)
 
         if not arquivo:
