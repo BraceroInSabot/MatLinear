@@ -39,7 +39,6 @@ class Arquivo(models.Model):
         db_column="ID"
     )
     arquivo = models.FileField(
-        upload_to=file_upload_to,
         storage=S3MediaStorage(),
         verbose_name="Arquivo",
         db_column="Arquivo"
