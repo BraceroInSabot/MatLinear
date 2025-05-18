@@ -52,6 +52,11 @@ class Arquivo(models.Model):
         auto_now_add=True,
         db_column="DataUpload"
     )
+    eliminado = models.BooleanField(
+        default=False,
+        verbose_name="Eliminado",
+        db_column="Eliminado"
+    )
 
     def __str__(self):
         return self.titulo

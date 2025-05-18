@@ -9,17 +9,21 @@ class ListarArquivosAPI(APIView):
         """
         Retorna uma lista de arquivos armazenados.
         """
-        arquivos = Arquivo.objects.all().order_by("-data_upload")
-        dados = [
-            {
-                "id": arq.id_arquivo,
-                "titulo": arq.titulo,
-                "tamanho_MB": arq.tamanho_MB,
-                "data_upload": arq.data_upload
-            }
-            for arq in arquivos
-        ]
-        print(dados[0])
+        try:
+            arquivos = Arquivo.objects.all().order_by("-data_upload")
+            dados = [
+                {
+                    "id": arq.id_arquivo,
+                    "titulo": arq.titulo,
+                    "tamanho_MB": arq.tamanho_MB,
+                    "data_upload": arq.data_upload,
+                    "eliminado": arq.eliminado,
+                }
+                for arq in arquivos
+            ]
+        except:
+            return Response({"erro": "Nenhum arquivo encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        
         return Response(data={"Dados": list((dados))}, status=200)
 
 class InserirArquivoAPI(APIView):
@@ -61,4 +65,21 @@ class InserirArquivoAPI(APIView):
             "data_upload": arq.data_upload
         }, status=status.HTTP_201_CREATED)
 
-   
+class DeletarArquivoAPI(APIView):
+    def post(self, request):
+        """
+        Deleta um arquivo armazenado.
+        """
+        id_arquivo = request.data.get("id_arquivo")
+
+        if not id_arquivo:
+            return Response({"erro": "ID do arquivo não informado."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            arq = Arquivo.objects.get(id_arquivo=id_arquivo)
+            arq.eliminado = True
+            arq.save()
+        except Arquivo.DoesNotExist:
+            return Response({"erro": "Arquivo não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({"mensagem": "Arquivo deletado com sucesso."}, status=status.HTTP_200_OK)
