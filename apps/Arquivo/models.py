@@ -39,7 +39,8 @@ class Arquivo(models.Model):
     titulo = models.CharField(
         max_length=255,
         verbose_name="Título",
-        db_column="Titulo"
+        db_column="Titulo",
+        unique=True
     )
     tamanho_MB = models.DecimalField(
         max_digits=10,

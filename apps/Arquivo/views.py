@@ -23,18 +23,30 @@ class ListarArquivosAPI(APIView):
         return Response(data={"Dados": list((dados))}, status=200)
 
 class InserirArquivoAPI(APIView):
+    def arq_rename(self, arquivo, titulo):
+        """
+        Renomeia o arquivo.
+        """
+        ext = arquivo.name.split(".")[-1]
+        arquivo.name = f"{titulo}.{ext}"
+
+        return arquivo
+
     def post(self, request):
         arquivo: object = request.FILES.get("arquivo")
         titulo = request.POST.get("titulo")
         tamanho_MB = round(arquivo.size / (1024 * 1024), 2)
-        print(tamanho_MB)
 
         if not arquivo:
             return Response({"erro": "Arquivo não enviado."}, status=status.HTTP_400_BAD_REQUEST)
         
         if not titulo:
             return Response({"erro": "Título obrigatório."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if Arquivo.objects.filter(titulo=titulo).exists():
+                return Response({"erro": "O título informado já existe. Tente outro título."}, status=status.HTTP_400_BAD_REQUEST)
 
+        arquivo = self.arq_rename(arquivo, titulo)
 
         arq = Arquivo.objects.create(
             arquivo=arquivo,
