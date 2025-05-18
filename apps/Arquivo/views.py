@@ -65,10 +65,10 @@ class InserirArquivoAPI(APIView):
             "data_upload": arq.data_upload
         }, status=status.HTTP_201_CREATED)
 
-class DeletarArquivoAPI(APIView):
+class EliminarArquivoAPI(APIView):
     def post(self, request):
         """
-        Deleta um arquivo armazenado.
+        Elimina um arquivo armazenado.
         """
         id_arquivo = request.data.get("id_arquivo")
 
