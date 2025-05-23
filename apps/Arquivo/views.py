@@ -2,6 +2,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import pandas as pd
 from .models import Arquivo
 
 class ListarArquivosAPI(APIView):
@@ -83,3 +84,29 @@ class EliminarArquivoAPI(APIView):
             return Response({"erro": "Arquivo não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({"mensagem": "Arquivo deletado com sucesso."}, status=status.HTTP_200_OK)
+
+class ConsultarArquivoAPI(APIView):
+    def get(self, request, *args, **kwargs):
+        arquivo_id = kwargs.get('pk')
+        try:
+            arq = Arquivo.objects.get(id_arquivo=arquivo_id)
+        except Arquivo.DoesNotExist:
+            return Response({"erro": "Arquivo não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+        dados = {
+            "id": arq.id_arquivo,
+            "titulo": arq.titulo,
+            "tamanho_MB": arq.tamanho_MB,
+            "data_upload": arq.data_upload,
+            "eliminado": arq.eliminado,
+            "url_download": arq.arquivo.url,
+        }
+
+        try:
+            with arq.arquivo.open() as f:
+                ctx = pd.read_excel(f)
+                dados["contexto"] = ctx.to_dict()  
+        except Exception as e:
+            dados["contexto"] = f"Erro ao ler arquivo: {str(e)}"
+
+        return Response(dados, status=200)
