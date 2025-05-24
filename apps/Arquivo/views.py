@@ -141,7 +141,6 @@ class ExportarArquivo(APIView):
         OBS.: Necessário usar POST para inserir o arquivo no Body.
         """
         dados = request.data
-        print(dados)
         if not dados:
             return Response({"erro": "Dados não enviados."}, status=status.HTTP_400_BAD_REQUEST)
         
