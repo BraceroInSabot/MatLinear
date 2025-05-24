@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minimizar</title>
+  </head>
+  <link rel="stylesheet" href="styles.css">
+  <body>
+    <div class="superior" style="display: flex; align-items: center;">
+      <a href="index.html" style="margin-left: 0px;">
+        <img class="zoom" src="./imagens/logo indian.png" alt="logotipo" style="width: 200px; height: auto;">
+        </a>
+      <h2 style="position: absolute; left: 50%; transform: translateX(-50%); margin: 0;">
+        MINIMIZAR
+      </h2>
+      <a href="relatorios.html" style="margin-left: auto;">
+        <button class="button1" style=" font-family: 'poppins-bold', sans-serif; margin-left: auto;">
+          Visualizar relatórios
+        </button>
+      </a>
+    </div>
+  
+    <div class="inserir">
+      <div class="form">
+        <div class="input">
+          <label for="produto">Produto</label>
+          <input type="text" id="produto" name="produto">
+        </div>
+        <div class="input">
+          <label for="preco">Preço</label>
+          <input type="text" id="preco" name="preco">
+        </div>
+        <div class="input">
+          <label for="minimo">Mínimo</label>
+          <input type="text" id="minimo" name="minimo">
+        </div>
+        <div class="input">
+          <label for="maximo">Máximo</label>
+          <input type="text" id="maximo" name="maximo">
+        </div>
+        <button class="button1" style="margin-bottom: 12px; height: 25px; width: 230px; text-align: top; padding: 2px; text-align: center;">
+          <img src="./imagens/botao-adicionar.svg" alt="botao-adicionar" class="iconemais" style="height: 110%; margin-left: 10px;">
+          <span style="flex-grow: 1; margin-right: 45px; margin-bottom: 2px;">Inserir</span>
+        </button>
+      </div> <!-- fim da div.form -->
+    </div> <!-- fim da div.inserir -->
+  
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th style="width: 270px;">Preço (R$)</th>
+          <th style="width: 200px;">Mínimo (UN, ml, g, kg...)</th>
+          <th style="width: 200px;">Máximo (UN, ml, g, kg...)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- para colocar os dados aki -->
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+        <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+    <div class="inferior" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+  <button class="buttonlimp" style="height: 25px; width: 230px; padding: 2px; text-align: center;">
+    <strong>LIMPAR</strong>
+  </button>
+
+  <button class="buttonazul" style="height: 25px; width: 230px; padding: 2px; text-align: center; margin-left: auto; margin-right: 10px;">
+    Importar
+  </button>
+  <button class="buttonazul" style="height: 25px; width: 230px; padding: 2px; text-align: center; margin-right: 10px;">
+    Exportar
+  </button>
+  <button class="buttonverde" style="height: 25px; width: 230px; padding: 2px; text-align: center;">
+    Salvar
+  </button>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,216 @@
+a {
+    display: inline;
+    width: 210px;
+    
+    text-decoration: none;
+  }
+
+  img.zoom {
+    transition: transform 0.3s ease;
+  }
+  
+  img.zoom:hover {
+    transform: scale(1.1);
+  }
+
+.superior {
+    border: 5px;
+    width: 1200px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    text-align: center;
+    font-family: 'poppins-bold', sans-serif;
+    padding: 25px;
+  }
+
+.inferior {
+    border: 5px;
+    width: 1200px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    text-align: center;
+    font-family: 'poppins-bold', sans-serif;
+  }
+
+.inserir {
+    padding: 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    max-width: 3000px;
+    margin: auto;
+    font-family: 'poppins', sans-serif;
+  }
+.form {
+  flex: 1;
+    border: 1px solid black;
+    padding: 30px;
+    height: 35px;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    width: 1500px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+.input {
+    height: 50px;
+    box-sizing: border-box;
+  }
+
+  tbody {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+.button1 {
+    background-color: #EB4E59;
+    cursor: pointer;
+    border: 2px solid transparent;
+    color: white;
+    padding: 10px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    font-family: 'poppins-bold', sans-serif;
+    font-size: 16px;
+    border-radius: 4px;
+    justify-content: center;
+    gap: 20px;
+    overflow: hidden;
+    transition: background-color .2s ease-in-out, color .05s ease-in-out .05s, border .05s ease-in-out .05s; 
+}
+
+    .button1:hover {
+    background-color: white;
+    color: black;
+    box-sizing: border-box;
+    border: 2px solid #EB4E59;
+}
+
+    .iconemais {
+    height: 110%;
+  margin-left: 10px;
+  filter: brightness(0) invert(1);
+  transition: filter 0.3s ease;
+}
+
+        .button1:hover .iconemais{
+    filter: none;
+}
+
+.tabela {
+    width: 1263px;
+    font-family: 'poppins-bold', sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #000 !important;
+    margin: 0 auto; /* centraliza horizontalmente */
+  }
+
+  .tabela-scroll {
+    height: 300px;           /* altura fixa */
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: auto;
+    display: block;
+    width: 100%;
+  }
+
+  
+    .tabela th,
+.tabela td {
+    border: 1px solid #000 !important;
+    padding: 8px;
+    text-align: center;
+    font-size: small;
+}
+
+.tabela th {
+    position: sticky;
+    top: 0;
+    background: gray;
+    z-index: 2;
+    color: white;
+}
+  
+    .tabela thead {
+    background-color: white;
+  }
+
+.buttonlimp {
+    background-color: #990c15;
+    border: 2px solid transparent;
+    color: white;
+    padding: 10px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    font-family: 'poppins-bold', sans-serif;
+    font-size: 18px;
+    border-radius: 4px;
+    justify-content: center;
+    gap: 20px;
+    overflow: hidden;
+    transition: background-color .2s ease-in-out, color .05s ease-in-out .05s, border .05s ease-in-out .05s; 
+  }
+
+    .buttonlimp:hover {
+    background-color: white;
+    color: #990c15;
+    box-sizing: border-box;
+    border: 2px solid #990c15;
+}
+
+.buttonazul {
+    background-color: #087cdb;
+    border: 2px solid transparent;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    font-family: 'poppins-bold', sans-serif;
+    font-size: 18px;
+    border-radius: 4px;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color .2s ease-in-out, color .05s ease-in-out .05s, border .05s ease-in-out .05s; 
+}
+
+    .buttonazul:hover {
+    background-color: white;
+    color: #087cdb;
+    box-sizing: border-box;
+    border: 2px solid #087cdb;
+}
+
+.buttonverde {
+    background-color: #00c500;
+    border: 2px solid transparent;
+    color: white;
+    padding: 10px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    font-family: 'poppins-bold', sans-serif;
+    font-size: 18px;
+    border-radius: 4px;
+    justify-content: center;
+    gap: 20px;
+    overflow: hidden;
+    transition: background-color .2s ease-in-out, color .05s ease-in-out .05s, border .05s ease-in-out .05s; 
+}
+
+    .buttonverde:hover {
+    background-color: white;
+    color: #00c500;
+    box-sizing: border-box;
+    border: 2px solid #00c500;
+};

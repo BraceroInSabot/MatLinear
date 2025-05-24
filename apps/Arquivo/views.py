@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import pandas as pd
+from io import BytesIO
+from django.http import HttpResponse
 from .models import Arquivo
 
 class ListarArquivosAPI(APIView):
@@ -110,3 +112,51 @@ class ConsultarArquivoAPI(APIView):
             dados["contexto"] = f"Erro ao ler arquivo: {str(e)}"
 
         return Response(dados, status=200)
+    
+class ImportarArquivo(APIView):
+    def post(self, request):
+        """
+        Importa um arquivo Excel e retorna os dados.
+
+        OBS.: Necessário usar POST para inserir o arquivo no Body.
+        """
+        arquivo = request.FILES.get("arquivo")
+
+        if not arquivo:
+            return Response({"erro": "Arquivo não enviado."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            df = pd.read_excel(arquivo)
+            dados = df.to_dict(orient="records")
+        except Exception as e:
+            return Response({"erro": f"Erro ao processar o arquivo: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(dados, status=200)
+
+class ExportarArquivo(APIView):
+    def post(self, request):
+        """
+        Exporta um arquivo Excel com os dados enviados.
+
+        OBS.: Necessário usar POST para inserir o arquivo no Body.
+        """
+        dados = request.data
+        print(dados)
+        if not dados:
+            return Response({"erro": "Dados não enviados."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            df = pd.DataFrame(dados)   
+            buffer = BytesIO()
+            df.to_excel(buffer, index=False, )
+            buffer.seek(0)
+            
+            response = HttpResponse(
+                buffer,
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                status=200
+            )
+            response['Content-Disposition'] = 'attachment; filename=exportado.xlsx'
+            return response
+        except Exception as e:
+            return Response({"erro": f"Erro ao processar os dados: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
