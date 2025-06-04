@@ -109,6 +109,59 @@ const exportarTabela = () => {
     }
 };
 
+function coletarDadosInputs() {
+    const linhas = document.querySelectorAll("#inputsContainer .input-row");
+    const dados = [];
+
+    linhas.forEach(linha => {
+        const selects = linha.querySelectorAll("select");
+        const input = linha.querySelector("input");
+
+        const campo = selects[0].value;
+        const operador = selects[1].value;
+        const valor = input.value;
+
+        dados.push({ campo, operador, valor });
+    });
+
+    return dados;
+}
+
+// Adiciona as restrições
+// document.getElementById("confirmarEnvio").onclick = () => {
+//     const dados = coletarDadosInputs();
+
+//     fetch("https://sua-api.com/filtro", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify(dados)
+//     })
+//     .then(response => response.json())
+//     .then(result => {
+//         console.log("Resposta da API:", result);
+//     })
+//     .catch(error => {
+//         console.error("Erro ao enviar:", error);
+//     });
+// };
+
+const salvarTabela = () => {
+    // Converte o array produto em um formato JSON e salva no localStorage
+    if (produto.length == 0) {
+        alert("Tabela vazia!");
+        return;
+    }
+
+    return console.log(
+        {
+            "tabela": produto, 
+            "restricao": coletarDadosInputs()
+        }
+    );
+}
+
 const btnExportar  = document.getElementById("btnExportar");
 btnExportar.addEventListener("click", exportarTabela);
 
@@ -117,6 +170,9 @@ limparTabelaBotao.addEventListener("click", limparTabela);
 
 const adicionarProdutoBotao = document.getElementById("adicionarProduto");
 adicionarProdutoBotao.addEventListener("click", adicionarProduto);
+
+const salvarTabelaBotao = document.getElementById("salvarTabela");
+salvarTabelaBotao.addEventListener("click", salvarTabela);
 
 document.getElementById("btnImportarDados").addEventListener("click", function() {
     document.getElementById("inputImportarDados").click();

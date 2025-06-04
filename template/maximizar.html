@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Maximizar</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./css/modal.css">
   </head>
-  <link rel="stylesheet" href="styles.css">
   <body>
     <div class="superior" style="display: flex; align-items: center;">
       <a href="index.html" style="margin-left: 0px;">
@@ -72,12 +73,46 @@
     </div>
   </div>
 
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>Adicionar Condição</h2>
+      <div id="inputsContainer">
+        <!-- Primeira linha -->
+        <div class="input-row">
+          <select>
+            <option value="Preço">Preço</option>
+            <option value="Quant. Min.">Quant. Min.</option>
+            <option value="Quant. Max.">Quant. Max.</option>
+            <option value="Quantidade">Quantidade</option>
+            <option value="Quantidade Total">Quantidade Total</option>
+            <option value="Preço Total">Preço Total</option>
+          </select>
+          <select>
+            <option value="==">==</option>
+            <option value="!=">!=</option>
+            <option value=">">></option>
+            <option value="<"><</option>
+            <option value=">=">>=</option>
+            <option value="<="><=</option>
+          </select>
+          <input type="text" placeholder="Valor 2" class="field-input">
+          <button class="remove-btn">Excluir</button>
+        </div>
+      </div>
+      <button class="btn" id="addRow">Adicionar Linha</button>
+    </div>
+  </div>
+  
+  <button class="buttonazul" id="openModal" style="height: 25px; width: 230px; padding: 2px; text-align: center; margin-left: auto; margin-right: 10px;">
+    Restrições
+  </button>
+
   <a href="./excel/modelo1.xlsx" download style="text-decoration:none;">
     <button class="buttonazul" style="height: 25px; width: 230px; padding: 2px; text-align: center; margin-left: auto; margin-right: 10px;">
       Importar Modelo
     </button>
   </a>
-
   
   <button id="btnImportarDados" class="buttonazul" style="height: 25px; width: 230px; padding: 2px; text-align: center; margin-left: auto; margin-right: 10px;">
     Importar Dados
@@ -87,10 +122,11 @@
   <button class="buttonazul" id="btnExportar" style="height: 25px; width: 230px; padding: 2px; text-align: center; margin-right: 10px;">
     Exportar
   </button>
-  <button class="buttonverde" style="height: 25px; width: 230px; padding: 2px; text-align: center;">
+  <button class="buttonverde" id="salvarTabela" style="height: 25px; width: 230px; padding: 2px; text-align: center;">
     Salvar
   </button>
     </div>
-    <script src="./js/script.js"></script>
+    <script src="./js/botoes.js"></script>
+    <script src="./js/modal.js"></script>
   </body>
 </html>
