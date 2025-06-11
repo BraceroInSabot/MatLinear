@@ -128,7 +128,7 @@ function coletarDadosInputs() {
 }
 
 // Adiciona as restrições
-// document.getElementById("confirmarEnvio").onclick = () => {
+// document.getElementById("salvarTabela").onclick = () => {
 //     const dados = coletarDadosInputs();
 
 //     fetch("https://sua-api.com/filtro", {
@@ -147,20 +147,41 @@ function coletarDadosInputs() {
 //     });
 // };
 
-const salvarTabela = () => {
-    // Converte o array produto em um formato JSON e salva no localStorage
+const salvarTabela = (modo) => {
     if (produto.length == 0) {
         alert("Tabela vazia!");
         return;
     }
 
-    return console.log(
-        {
-            "tabela": produto, 
-            "restricao": coletarDadosInputs()
+    const dados = {
+        "tabela": produto,
+        "restricao": coletarDadosInputs(),
+        "modo": modo
+    };
+
+    fetch("http://localhost:8000/api/v1/arquivo/inserir/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao enviar dados.");
         }
-    );
-}
+        return response.json();
+    })
+    .then(data => {
+        console.log("Sucesso:", data);
+        window.location.href = "http://127.0.0.1:5501/template/relatorios.html";
+    })
+    .catch(error => {
+        console.error("Erro:", error);
+    });
+
+    window.location.href = "http://127.0.0.1:5501/template/relatorios.html";
+};
 
 const btnExportar  = document.getElementById("btnExportar");
 btnExportar.addEventListener("click", exportarTabela);
@@ -171,8 +192,12 @@ limparTabelaBotao.addEventListener("click", limparTabela);
 const adicionarProdutoBotao = document.getElementById("adicionarProduto");
 adicionarProdutoBotao.addEventListener("click", adicionarProduto);
 
-const salvarTabelaBotao = document.getElementById("salvarTabela");
-salvarTabelaBotao.addEventListener("click", salvarTabela);
+document.querySelectorAll("#salvarTabela").forEach(btn => {
+    btn.addEventListener("click", function() {
+        const modo = this.getAttribute("data-modo") === "true";
+        salvarTabela(modo);
+    });
+});
 
 document.getElementById("btnImportarDados").addEventListener("click", function() {
     document.getElementById("inputImportarDados").click();

@@ -6,6 +6,7 @@ import pandas as pd
 from io import BytesIO
 from django.http import HttpResponse
 from .models import Arquivo
+from .utils.handleFile import arq_rename, titulo_rename, criarArquivo
 
 class ListarArquivosAPI(APIView):
     def get(self, request):
@@ -30,36 +31,38 @@ class ListarArquivosAPI(APIView):
         return Response(data={"Dados": list((dados))}, status=200)
 
 class InserirArquivoAPI(APIView):
-    def arq_rename(self, arquivo, titulo):
-        """
-        Renomeia o arquivo.
-        """
-        ext = arquivo.name.split(".")[-1]
-        arquivo.name = f"{titulo}.{ext}"
-
-        return arquivo
-
     def post(self, request):
-        arquivo: object = request.FILES.get("arquivo")
-        titulo = request.POST.get("titulo")
-        tamanho_MB = round(arquivo.size / (1024 * 1024), 2)
+        tabela: list = request.data.get("tabela")
+        restricao: list = request.data.get("restricao")
+        titulo: str = request.data.get("titulo", "Projeto")
+        modo: bool = request.data.get("modo", False)
 
-        if not arquivo:
-            return Response({"erro": "Arquivo não enviado."}, status=status.HTTP_400_BAD_REQUEST)
-        
+        if not tabela:
+            return Response({"erro": "Conteúdo não encontrado."}, status=status.HTTP_400_BAD_REQUEST)
+
         if not titulo:
             return Response({"erro": "Título obrigatório."}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            if Arquivo.objects.filter(titulo=titulo).exists():
-                return Response({"erro": "O título informado já existe. Tente outro título."}, status=status.HTTP_400_BAD_REQUEST)
 
-        arquivo = self.arq_rename(arquivo, titulo)
+        if Arquivo.objects.filter(titulo=titulo).exists():
+            for tr in range(3):
+                temp = f"{titulo} ({tr})"
+                if Arquivo.objects.filter(titulo=temp).exists() and tr < 3:
+                    continue
+                elif tr > 3:
+                    return Response({"erro": "O título informado já existe. Tente outro título."}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    titulo = temp
 
+        arquivoNome = arq_rename(titulo)
+        titulo = titulo_rename(titulo)
+        file_obj = criarArquivo(tabela, restricao, arquivoNome, modo)
+        
         arq = Arquivo.objects.create(
-            arquivo=arquivo,
+            arquivo=file_obj,
             titulo=titulo,
-            tamanho_MB=tamanho_MB
+            tamanho_MB=round(file_obj.size / (1024 * 1024), 2)  # opcional
         )
+
         return Response({
             "mensagem": "Arquivo enviado com sucesso.",
             "id": arq.id_arquivo,

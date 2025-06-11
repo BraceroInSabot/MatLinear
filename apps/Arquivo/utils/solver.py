@@ -1,115 +1,135 @@
 import pandas as pd
 import pulp as pp
 
-
-def preencher_tabela():
-    macarrao = pd.DataFrame(columns=['Nome', 'Preço', 'Mínimo', 'Máximo'])
-
-    while True:
-        r = input("Deseja adicionar um ingrediente? (s/n): ").strip().lower()
-        
-        if r == 's':
-            nome = input("Digite o nome do ingrediente: ").strip()
-
-            while True:
-                try:
-                    preco = float(input("Digite o preço (ou lucro) por unidade do ingrediente: "))
-                    break
-                except ValueError:
-                    print("Valor inválido. Digite um número (ex: 4.50).")
-
-            while True:
-                try:
-                    minimo = float(input("Informe a quantidade mínima do ingrediente: "))
-                    break
-                except ValueError:
-                    print("Valor inválido. Digite um número.")
-
-            while True:
-                try:
-                    maximo = float(input("Informe a quantidade máxima do ingrediente: "))
-                    if maximo < minimo:
-                        print("O valor máximo não pode ser menor que o mínimo. Digite novamente.")
-                        continue
-                    break
-                except ValueError:
-                    print("Valor inválido. Digite um número.")
-
-            macarrao.loc[len(macarrao)] = [nome, preco, minimo, maximo]
-
-        elif r == 'n':
-            print("\nPreenchimento finalizado.")
-            break
-
-        else:
-            print("Resposta inválida. Responda apenas com 's' para SIM e 'n' para NÃO.")
+def transformar_tabela(tabela: dict) -> pd.DataFrame:
+    """
+    Transforma um dicionário de tabela em um DataFrame do pandas.
     
-    return macarrao
+    :param tabela: Dicionário contendo os dados da tabela com produtos, preços, mínimo e máximo.
+    :return: DataFrame com os dados da tabela.
+    """
+    df = pd.DataFrame(tabela, columns=['Produto', 'Preço', 'Quant. Min.', 'Quant. Max.'])
+    
+    colunas_necessarias = ['Produto', 'Preço', 'Quant. Min.', 'Quant. Max.']
+    for coluna in colunas_necessarias:
+        if coluna not in df.columns:
+            raise ValueError(f"A coluna '{coluna}' é necessária na tabela.")
+    
+    return df
 
 
-def resolver_problema(df, total_min, total_max, modo):
-    if modo == 'min':
-        prob = pp.LpProblem("Minimizar_Custo", pp.LpMinimize)
-    else:
-        prob = pp.LpProblem("Maximizar_Lucro", pp.LpMaximize)
-
-    variaveis = {
-        row['Nome']: pp.LpVariable(row['Nome'], lowBound=row['Mínimo'], upBound=row['Máximo'], cat='Continuous')
-        for _, row in df.iterrows()
-    }
-
-    if modo == 'min':
-        prob += pp.lpSum(variaveis[nome] * df.loc[df['Nome'] == nome, 'Preço'].values[0] for nome in variaveis)
-    else:
-        prob += pp.lpSum(variaveis[nome] * df.loc[df['Nome'] == nome, 'Preço'].values[0] for nome in variaveis)
-
-    prob += pp.lpSum(variaveis.values()) >= total_min, "Quantidade_Minima_Total"
-    prob += pp.lpSum(variaveis.values()) <= total_max, "Quantidade_Maxima_Total"
-
-    prob.solve()
-
-    resultado = {
-        'Status': pp.LpStatus[prob.status],
-        'Objetivo': pp.value(prob.objective),
-        'Ingredientes': {nome: variaveis[nome].varValue for nome in variaveis}
-    }
-
+def processar_tabela(tabela: dict, restricao: dict, modo: bool):
+    """
+    Processa a tabela e a restrição para otimização de ingredientes.
+    
+    :param tabela: Dicionário contendo os dados da tabela com produtos, preços, mínimo e máximo.
+    :param restricao: Dicionário com as restrições dos atributos da tabela.
+    :return: Resultado da otimização.
+    """
+    tabela_normal = transformar_tabela(tabela)
+    
+    modo = 'modo' if modo else 'min'
+    
+    resultado = resolver_problema(tabela_normal, modo, restricao)
+    
     return resultado
 
 
-def main():
-    df = preencher_tabela()
-    print("\nTabela Final:")
-    print(df)
+def processar_restricao(prob, df, variaveis, restricao):
+    for r in restricao:
+        campo = r.get('campo')
+        operador = r.get('operador')
+        valor = r.get('valor')
 
-    while True:
-        try:
-            total_min = float(input("\nInforme a quantidade total MÍNIMA do produto final: "))
-            total_max = float(input("Informe a quantidade total MÁXIMA do produto final: "))
-            if total_max < total_min:
-                print("O valor máximo não pode ser menor que o mínimo.")
-                continue
-            break
-        except ValueError:
-            print("Valor inválido. Digite números válidos.")
+        print(variaveis, f"Variaveis: {variaveis}")
 
-    while True:
-        modo = input("\nDeseja minimizar custo ou maximizar lucro? (Digite 'min' ou 'max'): ").strip().lower()
-        if modo in ['min', 'max']:
-            break
+        if campo in ['Preço', 'Quant. Min.', 'Quant. Max.', 'Quantidade', 'Quantidade Total', 'Preço Total']:
+            try:
+                valor = float(valor)
+            except ValueError:
+                raise ValueError(f"Valor inválido para o campo '{campo}': {valor}")
+            
+        if campo == 'Quantidade Total':
+            expressao = pp.lpSum(variaveis.values())
+        elif campo == 'Preço Total':
+            expressao = pp.lpSum(variaveis[nome] * df.loc[df['Produto'] == nome, 'Preço'].values[0] for nome in variaveis)
+        elif campo in ['Preço', 'Quant. Min.', 'Quant. Max.', 'Quantidade']:
+            for nome in variaveis:
+
+                if campo == 'Quantidade':
+                    valor_expr = variaveis[nome]
+                else:
+                    coef = float(df.loc[df['Produto'] == nome, campo].values[0])
+                    valor_expr = coef * variaveis[nome]  # expressão matemática válida
+                
+                if operador not in {'==', '>=', '<=', '>', '<'}:
+                    raise ValueError(f"Operador inválido: {operador}")
+
+                if valor is None:
+                    raise ValueError(f"Valor ausente para o campo '{campo}'")
+
+                restr_expr = {
+                    '==': valor_expr == valor,
+                    '>=': valor_expr >= valor,
+                    '<=': valor_expr <= valor
+                }[operador]
+
+                prob += restr_expr, f"Restricao_{campo}_{nome}"
+            return
+
         else:
-            print("Opção inválida. Digite apenas 'min' ou 'max'.")
+            raise ValueError(f"Campo de restrição inválido: {campo}")
 
-    resultado = resolver_problema(df, total_min, total_max, modo)
+        if campo in ['Quantidade Total', 'Preço Total']:
+            restr_expr = {
+                '==': expressao == valor,
+                '>=': expressao >= valor,
+                '<=': expressao <= valor,
+                '>':  expressao > valor,
+                '<':  expressao < valor
+            }[operador]
+            prob += restr_expr, f"Restricao_{campo.replace(' ', '_')}"
+        
 
-    print("\nResultado da Otimização:")
-    print(f"Status: {resultado['Status']}")
-    objetivo_txt = "Custo Total" if modo == 'min' else "Lucro Total"
-    print(f"{objetivo_txt}: R$ {resultado['Objetivo']:.2f}")
-    print("Distribuição dos Ingredientes:")
-    for nome, valor in resultado['Ingredientes'].items():
-        print(f" - {nome}: {valor:.2f} unidades")
+def resolver_problema(df: pd.DataFrame, modo: str, restricao) -> dict:
+    if not restricao:
+        restricao = []
+    elif isinstance(restricao, dict):
+        restricao = [restricao]
 
+    objetivo = pp.LpMinimize if modo == 'min' else pp.LpMaximize
+    prob = pp.LpProblem("Problema_Otimizacao", objetivo)
 
-if __name__ == "__main__":
-    main()
+    variaveis = {
+        row['Produto']: pp.LpVariable(
+            row['Produto'],
+            lowBound=row['Quant. Min.'],
+            upBound=row['Quant. Max.'],
+            cat='Continuous'
+        )
+        for _, row in df.iterrows()
+    }
+
+    # Função objetivo: custo total (preço x quantidade)
+    prob += pp.lpSum(
+        variaveis[nome] * float(df.loc[df['Produto'] == nome, 'Preço'].values[0])
+        for nome in variaveis
+    )
+
+    # Restrições
+    processar_restricao(prob, df, variaveis, restricao)
+
+    # Resolver o problema
+    prob.solve()
+
+    # Resultado detalhado
+    resultado_df = df.copy()
+    resultado_df['Quantidade'] = resultado_df['Produto'].map(lambda nome: variaveis[nome].varValue)
+    resultado_df['Preço Total'] = resultado_df['Quantidade'] * resultado_df['Preço']
+
+    return {
+        'Status': pp.LpStatus[prob.status],
+        'Objetivo': pp.value(prob.objective),
+        'Ingredientes': {nome: variaveis[nome].varValue for nome in variaveis},
+        'Resultado': resultado_df
+    }
