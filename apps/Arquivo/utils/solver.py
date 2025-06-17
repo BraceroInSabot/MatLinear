@@ -40,8 +40,8 @@ def processar_restricao(prob, df, variaveis, restricao):
         campo = r.get('campo')
         operador = r.get('operador')
         valor = r.get('valor')
-
-        print(variaveis, f"Variaveis: {variaveis}")
+        
+        operador = '<=' if operador == '<' else '>='
 
         if campo in ['Preço', 'Quant. Min.', 'Quant. Max.', 'Quantidade', 'Quantidade Total', 'Preço Total']:
             try:
@@ -52,7 +52,7 @@ def processar_restricao(prob, df, variaveis, restricao):
         if campo == 'Quantidade Total':
             expressao = pp.lpSum(variaveis.values())
         elif campo == 'Preço Total':
-            expressao = pp.lpSum(variaveis[nome] * df.loc[df['Produto'] == nome, 'Preço'].values[0] for nome in variaveis)
+            expressao = pp.lpSum(variaveis[nome] * float(df.loc[df['Produto'] == nome, 'Preço'].values[0]) for nome in variaveis)
         elif campo in ['Preço', 'Quant. Min.', 'Quant. Max.', 'Quantidade']:
             for nome in variaveis:
 
@@ -85,44 +85,52 @@ def processar_restricao(prob, df, variaveis, restricao):
                 '==': expressao == valor,
                 '>=': expressao >= valor,
                 '<=': expressao <= valor,
-                '>':  expressao > valor,
-                '<':  expressao < valor
             }[operador]
             prob += restr_expr, f"Restricao_{campo.replace(' ', '_')}"
+      
         
-
 def resolver_problema(df: pd.DataFrame, modo: str, restricao) -> dict:
+    # Validação e sanitização dos dados
+    for coluna in ['Preço', 'Quant. Min.', 'Quant. Max.']:
+        if coluna not in df.columns:
+            raise ValueError(f"Coluna obrigatória '{coluna}' não encontrada no DataFrame.")
+        df[coluna] = pd.to_numeric(df[coluna], errors='raise')
+
     if not restricao:
         restricao = []
     elif isinstance(restricao, dict):
         restricao = [restricao]
 
+    # Definição do objetivo
     objetivo = pp.LpMinimize if modo == 'min' else pp.LpMaximize
     prob = pp.LpProblem("Problema_Otimizacao", objetivo)
 
-    variaveis = {
-        row['Produto']: pp.LpVariable(
-            row['Produto'],
-            lowBound=row['Quant. Min.'],
-            upBound=row['Quant. Max.'],
+    # Criação das variáveis de decisão
+    variaveis = {}
+    for _, row in df.iterrows():
+        nome = row['Produto']
+        quant_min = float(row['Quant. Min.'])
+        quant_max = float(row['Quant. Max.'])
+        variaveis[nome] = pp.LpVariable(
+            nome,
+            lowBound=quant_min,
+            upBound=quant_max,
             cat='Continuous'
         )
-        for _, row in df.iterrows()
-    }
 
-    # Função objetivo: custo total (preço x quantidade)
+    # Definição da função objetivo (minimizar ou maximizar custo total)
     prob += pp.lpSum(
-        variaveis[nome] * float(df.loc[df['Produto'] == nome, 'Preço'].values[0])
+        variaveis[nome] * df.loc[df['Produto'] == nome, 'Preço'].values[0]
         for nome in variaveis
     )
 
-    # Restrições
+    # Aplicação das restrições
     processar_restricao(prob, df, variaveis, restricao)
 
     # Resolver o problema
     prob.solve()
 
-    # Resultado detalhado
+    # Montagem do resultado
     resultado_df = df.copy()
     resultado_df['Quantidade'] = resultado_df['Produto'].map(lambda nome: variaveis[nome].varValue)
     resultado_df['Preço Total'] = resultado_df['Quantidade'] * resultado_df['Preço']

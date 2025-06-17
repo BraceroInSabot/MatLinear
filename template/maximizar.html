@@ -13,13 +13,31 @@
       <img class="zoom" src="./imagens/logo indian.png" alt="logotipo" style="width: 200px; height: auto;">
       </a>
       <h2 style="position: absolute; left: 50%; transform: translateX(-50%); margin: 0;">
-        MAXIMIZAR
+        <select name="modo" id="modo" style="
+          appearance: none;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          background: transparent;
+          border: none;
+          font-size: 1.5em;
+          font-weight: bold;
+          text-align: center;
+          padding-right: 20px;
+          cursor: pointer;
+        ">
+          <option value="1">Maximizar</option>
+          <option value="0">Minimizar</option>
+        </select>
       </h2>
       <a href="relatorios.html" style="margin-left: auto;">
       <button class="button1" style=" font-family: 'poppins-bold', sans-serif; margin-left: auto;">
         Visualizar relatórios
       </button>
       </a>
+    </div>
+
+    <div style="display: flex; justify-content: center;">
+      <input type="text" id="titulo" name="titulo" placeholder="Título do relatório" style="width: 300px; height: 30px; margin-top: 10px; margin-bottom: 10px; padding-left: 10px; font-size: 16px;">
     </div>
   
     <div class="inserir">

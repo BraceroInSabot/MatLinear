@@ -153,7 +153,13 @@ const salvarTabela = (modo) => {
         return;
     }
 
+    if (document.getElementById("titulo").value == null || document.getElementById("titulo").value == "") {
+        alert("Título não pode ser vazio!");
+        return;
+    }
+
     const dados = {
+        "titulo": document.getElementById("titulo").value,
         "tabela": produto,
         "restricao": coletarDadosInputs(),
         "modo": modo
@@ -179,8 +185,6 @@ const salvarTabela = (modo) => {
     .catch(error => {
         console.error("Erro:", error);
     });
-
-    window.location.href = "http://127.0.0.1:5501/template/relatorios.html";
 };
 
 const btnExportar  = document.getElementById("btnExportar");
@@ -194,7 +198,7 @@ adicionarProdutoBotao.addEventListener("click", adicionarProduto);
 
 document.querySelectorAll("#salvarTabela").forEach(btn => {
     btn.addEventListener("click", function() {
-        const modo = this.getAttribute("data-modo") === "true";
+        const modo = document.querySelector("#modo").value === "1";
         salvarTabela(modo);
     });
 });

@@ -7,8 +7,31 @@ from io import BytesIO
 from django.http import HttpResponse
 from .models import Arquivo
 from .utils.handleFile import arq_rename, titulo_rename, criarArquivo
+import boto3
+from botocore.exceptions import ClientError
+from django.http import HttpResponse, Http404
+from django.conf import settings
 
 class ListarArquivosAPI(APIView):
+    def download_arquivo(arquivo):
+        s3 = boto3.client(
+            's3',
+            endpoint_url="http://localhost:9000",
+            aws_access_key_id=settings.MINIO_ACCESS_KEY,
+            aws_secret_access_key=settings.MINIO_SECRET_KEY,
+            region_name='us-east-1'
+        )
+
+        try:
+            response = s3.get_object(Bucket=settings.MINIO_BUCKET_NAME, Key=arquivo.arquivo.name)
+            conteudo = response['Body'].read()
+        except ClientError:
+            raise Http404("Erro ao acessar o arquivo no MinIO.")
+
+        resposta = HttpResponse(conteudo, content_type='application/octet-stream')
+        resposta['Content-Disposition'] = f'attachment; filename="{arquivo.titulo}.xlsx"'
+        return resposta
+    
     def get(self, request):
         """
         Retorna uma lista de arquivos armazenados.
@@ -22,6 +45,7 @@ class ListarArquivosAPI(APIView):
                     "tamanho_MB": arq.tamanho_MB,
                     "data_upload": arq.data_upload,
                     "eliminado": arq.eliminado,
+                    "url_download": str(arq.arquivo.url).replace("https", "http") if arq.arquivo else None
                 }
                 for arq in arquivos
             ]
@@ -162,3 +186,34 @@ class ExportarArquivo(APIView):
             return response
         except Exception as e:
             return Response({"erro": f"Erro ao processar os dados: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+class DownloadArquivoAPI(APIView):
+    @staticmethod
+    def download_arquivo(arquivo):
+        s3 = boto3.client(
+            's3',
+            endpoint_url="http://localhost:9000",
+            aws_access_key_id=settings.MINIO_ACCESS_KEY,
+            aws_secret_access_key=settings.MINIO_SECRET_KEY,
+            region_name='us-east-1'
+        )
+
+        try:
+            response = s3.get_object(Bucket=settings.MINIO_BUCKET_NAME, Key=arquivo.arquivo.name)
+            conteudo = response['Body'].read()
+        except ClientError:
+            raise Http404("Erro ao acessar o arquivo no MinIO.")
+
+        resposta = HttpResponse(conteudo, content_type='application/octet-stream')
+        resposta['Content-Disposition'] = f'attachment; filename="{arquivo.titulo}.xlsx"'
+        return resposta
+
+    def get(self, request, *args, **kwargs):
+        arquivo_id = kwargs.get('pk')
+
+        try:
+            arq = Arquivo.objects.get(id_arquivo=arquivo_id)
+        except Arquivo.DoesNotExist:
+            return Response({"erro": "Arquivo não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+        return self.download_arquivo(arq)

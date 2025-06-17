@@ -6,6 +6,7 @@ from .views import (
     ConsultarArquivoAPI,
     ImportarArquivo,
     ExportarArquivo,
+    DownloadArquivoAPI,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path("consultar/<int:pk>/", ConsultarArquivoAPI.as_view(), name="consultar_arquivo"),
     path("importar/", ImportarArquivo.as_view(), name="importar_arquivo"),
     path("exportar/", ExportarArquivo.as_view(), name="exportar_arquivo"),
+    path("download/<int:pk>/", DownloadArquivoAPI.as_view(), name="download_arquivo"),
 ]
